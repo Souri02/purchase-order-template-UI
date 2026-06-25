@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Countera — Basic Template for Purchase Orders</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="page-header">
+    <div class="brand">
+      <span class="brand-mark">◆</span>
+      <span class="brand-name">countera</span>
+    </div>
+    <div class="page-subtitle">Basic Template for Purchase Orders</div>
+  </header>
+
+  <main class="stage">
+    <!-- Phone device frame -->
+    <div class="phone" id="phone">
+      <div class="phone-notch"></div>
+
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span>9:41</span>
+        <span class="status-icons">●●● ◧ ▮</span>
+      </div>
+
+      <!-- ============ SCREEN 1: LOGIN ============ -->
+      <section class="screen screen--login active" data-screen="login">
+        <div class="login-wrap">
+          <div class="login-brand">
+            <span class="brand-mark big">◆</span>
+            <h1>countera</h1>
+            <p>Purchase Order Portal</p>
+          </div>
+          <form class="login-form" id="loginForm">
+            <label>
+              <span>Email</span>
+              <input type="email" value="fremont.user@countera.com" autocomplete="username" />
+            </label>
+            <label>
+              <span>Password</span>
+              <input type="password" value="••••••••" autocomplete="current-password" />
+            </label>
+            <button type="submit" class="btn btn--primary btn--block">Sign in</button>
+          </form>
+          <p class="login-note">Basic user · Store: Fremont</p>
+        </div>
+      </section>
+
+      <!-- ============ SCREEN 2: DASHBOARD ============ -->
+      <section class="screen screen--dashboard" data-screen="dashboard">
+        <div class="topbar">
+          <div class="topbar-title">Home</div>
+          <div class="avatar">FU</div>
+        </div>
+        <div class="dash-greeting">
+          <h2>Welcome back</h2>
+          <p>Fremont Store</p>
+        </div>
+        <!-- Only Purchase Order is visible for basic users (access controlled) -->
+        <div class="tabs-grid">
+          <button class="tile" id="openPO">
+            <span class="tile-icon">🧾</span>
+            <span class="tile-label">Purchase Order</span>
+            <span class="tile-sub">Create &amp; manage POs</span>
+          </button>
+        </div>
+        <p class="dash-hint">Your access level shows only the tools you need.</p>
+      </section>
+
+      <!-- ============ SCREEN 3: PO ENTRY ============ -->
+      <section class="screen screen--po" data-screen="po">
+        <div class="topbar">
+          <button class="icon-btn" data-back="dashboard">‹</button>
+          <div class="topbar-title">Purchase Order</div>
+          <span class="topbar-spacer"></span>
+        </div>
+
+        <div class="po-scroll">
+          <!-- Header: distributor + delivery date -->
+          <div class="po-head">
+            <label class="field field--dist">
+              <span class="field-label">Distributor Name</span>
+              <select id="distributor">
+                <option value="">Select distributor</option>
+                <option>PepsiCo Distribution</option>
+                <option>Coca-Cola Bottling Co.</option>
+                <option>Sysco Foods</option>
+                <option>Reyes Beverage Group</option>
+              </select>
+            </label>
+            <label class="field field--date">
+              <span class="field-label">Exp. Delivery</span>
+              <input type="date" id="deliveryDate" />
+            </label>
+          </div>
+
+          <!-- Ship to -->
+          <label class="field field--ship">
+            <span class="field-label">Ship to</span>
+            <select id="shipTo">
+              <!-- populated by JS based on store access -->
+            </select>
+            <small class="ship-note" id="shipNote"></small>
+          </label>
+
+          <div class="section-divider"><span>Products</span></div>
+
+          <!-- Product rows are injected here -->
+          <div id="productList" class="product-list"></div>
+        </div>
+
+        <!-- Add to order (bottom-left) -->
+        <div class="po-footer">
+          <button class="btn btn--primary" id="addToOrder">Add to order</button>
+          <span class="po-count" id="poCount">0 items</span>
+        </div>
+      </section>
+
+      <!-- ============ SCREEN 4: REVIEW ============ -->
+      <section class="screen screen--review" data-screen="review">
+        <div class="topbar">
+          <button class="icon-btn" data-back="po">‹</button>
+          <div class="topbar-title">Review Order</div>
+          <span class="topbar-spacer"></span>
+        </div>
+
+        <div class="review-scroll">
+          <div class="review-head" id="reviewHead"></div>
+          <div class="section-divider"><span>Items</span></div>
+          <div id="reviewList" class="review-list"></div>
+          <p class="review-warn" id="reviewWarn"></p>
+        </div>
+
+        <!-- Submit (bottom-right) -->
+        <div class="review-footer">
+          <span class="review-total" id="reviewTotal"></span>
+          <button class="btn btn--primary" id="submitOrder">Submit</button>
+        </div>
+      </section>
+
+      <!-- ============ SCREEN 5: SUCCESS ============ -->
+      <section class="screen screen--success" data-screen="success">
+        <div class="success-wrap">
+          <div class="success-check">✓</div>
+          <h2>Order placed</h2>
+          <p id="successMsg">Your purchase order has been submitted successfully.</p>
+          <button class="btn btn--primary btn--block" id="newOrder">Create another order</button>
+        </div>
+      </section>
+
+      <!-- Add-method chooser (scan vs search) -->
+      <div class="sheet-overlay" id="methodOverlay" hidden>
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <h3 class="sheet-title">Add a product</h3>
+          <p class="sheet-sub">Scan the barcode, or search by name if it's damaged or missing (e.g. fresh produce).</p>
+          <button class="method-btn" id="methodScan">
+            <span class="method-icon">📷</span>
+            <span class="method-text"><b>Scan barcode</b><small>Open camera and scan</small></span>
+            <span class="method-arrow">›</span>
+          </button>
+          <button class="method-btn" id="methodSearch">
+            <span class="method-icon">🔎</span>
+            <span class="method-text"><b>Search by name</b><small>No barcode? Type the product name</small></span>
+            <span class="method-arrow">›</span>
+          </button>
+          <button class="btn btn--ghost btn--block sheet-cancel" id="methodCancel">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Search-by-name overlay -->
+      <div class="sheet-overlay" id="searchOverlay" hidden>
+        <div class="sheet sheet--search">
+          <div class="sheet-handle"></div>
+          <div class="search-head">
+            <h3 class="sheet-title">Search product</h3>
+            <button class="icon-btn" id="searchClose">✕</button>
+          </div>
+          <input type="text" id="searchInput" class="search-input" placeholder="Type a product name…" autocomplete="off" />
+          <div class="search-results" id="searchResults"></div>
+        </div>
+      </div>
+
+      <!-- Camera / scan overlay -->
+      <div class="scan-overlay" id="scanOverlay" hidden>
+        <div class="scan-camera">
+          <div class="scan-frame">
+            <span class="scan-line"></span>
+          </div>
+          <p class="scan-text">Scanning barcode…</p>
+          <p class="scan-sub">Point camera at the product barcode</p>
+          <button class="btn btn--ghost" id="cancelScan">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="legend">
+      <h3>How to use this prototype</h3>
+      <ol>
+        <li>Sign in (basic user) — only <b>Purchase Order</b> is shown.</li>
+        <li>Open Purchase Order to land directly on the PO screen.</li>
+        <li>Pick a distributor, delivery date &amp; ship-to store.</li>
+        <li>Tap the grey <b>Add Product</b> box — choose <b>Scan barcode</b> or <b>Search by name</b> (for damaged/missing barcodes &amp; fresh produce).</li>
+        <li>Product loads from the database; set <b>Qty</b>, <b>Case/Each</b> &amp; use <b>+ / −</b>.</li>
+        <li>A completed product turns <span class="dot dot--green"></span> green; a new Add Product appears.</li>
+        <li><b>Add to order</b> → review. Missing details show <span class="dot dot--red"></span> red.</li>
+        <li><b>Submit</b> to place the order.</li>
+      </ol>
+      <p class="legend-note">Barcode scan &amp; product lookup are simulated against a sample product database for this static demo.</p>
+    </aside>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
